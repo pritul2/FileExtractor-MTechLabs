@@ -1,5 +1,6 @@
 from aiohttp import web
 import os
+import zipfile
 
 routes = web.RouteTableDef()
 
@@ -9,6 +10,13 @@ def html_response(document):
 
 async def index_handler(request):
     return html_response('./templates/homepage.html')
+
+async def read_zip(filename):
+    with zipfile.ZipFile(os.path.join(os.getcwd()+'/static/Files/', filename), 'r') as zip_ref:
+        zip_ref.extractall(os.path.join(os.getcwd()+'/static/Zip_Extracted/'))
+    li = os.listdir(os.path.join(os.getcwd()+'/static/Zip_Extracted/'))
+    print(li)
+    return
 
 async def store_zip(request):
 
@@ -25,6 +33,8 @@ async def store_zip(request):
             size += len(chunk)
             f.write(chunk)
 
+
+    await read_zip(filename)
     return web.Response(text='{} sized of {} successfully stored'
                              ''.format(filename, size))
 
