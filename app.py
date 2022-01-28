@@ -1,4 +1,5 @@
 from aiohttp import web
+import os
 
 routes = web.RouteTableDef()
 
@@ -9,11 +10,26 @@ def html_response(document):
 async def index_handler(request):
     return html_response('./templates/homepage.html')
 
-async def do_myfun(request):
-    input()
+async def store_zip(request):
+
+    reader = await request.multipart()
+    zip = await reader.next()
+    filename = zip.filename
+    # You cannot rely on Content-Length if transfer is chunked.
+    size = 0
+    with open(os.path.join(os.getcwd()+'/static/Files/', filename), 'wb') as f:
+        while True:
+            chunk = await zip.read_chunk()  # 8192 bytes by default.
+            if not chunk:
+                break
+            size += len(chunk)
+            f.write(chunk)
+
+    return web.Response(text='{} sized of {} successfully stored'
+                             ''.format(filename, size))
 
 app = web.Application()
 app.add_routes(routes)
 app.router.add_get('/', index_handler)
-app.router.add_post('/myfun', do_myfun)
+app.router.add_post('/myfun', store_zip)
 web.run_app(app)
