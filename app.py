@@ -1,3 +1,4 @@
+import aiohttp
 from aiohttp import web
 import os
 import zipfile
@@ -11,12 +12,21 @@ def html_response(document):
 async def index_handler(request):
     return html_response('./templates/homepage.html')
 
+
+async def json_passer(request):
+
+    url = "http://0.0.0.0:8080/jss"
+
+    async with aiohttp.ClientSession() as session:
+        await session.post(url, json={'test': 'object'})
+
+    return html_response('./templates/test.html')
+
+
 async def read_zip(filename):
     with zipfile.ZipFile(os.path.join(os.getcwd()+'/static/Files/', filename), 'r') as zip_ref:
         zip_ref.extractall(os.path.join(os.getcwd()+'/static/Zip_Extracted/'))
     li = os.listdir(os.path.join(os.getcwd()+'/static/Zip_Extracted/'))
-    print(li)
-    return
 
 async def store_zip(request):
 
@@ -35,11 +45,14 @@ async def store_zip(request):
 
 
     await read_zip(filename)
-    return web.Response(text='{} sized of {} successfully stored'
-                             ''.format(filename, size))
+
+    return web.HTTPFound('/jss')
+
+
 
 app = web.Application()
 app.add_routes(routes)
 app.router.add_get('/', index_handler)
 app.router.add_post('/myfun', store_zip)
+app.router.add_get('/jss', json_passer)
 web.run_app(app)
