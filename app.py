@@ -1,63 +1,74 @@
-import aiohttp_jinja2
-import jinja2
-import aiohttp
+import setup_server
+from setup_server import app
 from aiohttp import web
+import aiohttp_jinja2
 import os
 import zipfile
 
-routes = web.RouteTableDef()
+'''
+HTML Parser to parse the html web pages
+'''
+class HtmlParser:
+    def __init__(self):
+        self.home_page_url = "./templates/homepage.html"
+        pass
 
-def html_response(document):
-    s = open(document, "r")
-    return web.Response(text=s.read(), content_type='text/html')
+    # This function parse the html web page #
+    def html_response(self,document):
+        self.rd_ptr = open(document, "r")
+        return web.Response(text=self.rd_ptr.read(), content_type='text/html')
 
-async def index_handler(request):
-    return html_response('./templates/homepage.html')
-
-
-async def json_passer(request):
-    context = {'name': 'Andrew', 'surname': 'Svetlov'}
-    input(context)
-    response = aiohttp_jinja2.render_template('test.html',
-                                              request,
-                                              context)
-    response.headers['Content-Language'] = 'eng'
-
-    return response
-
-async def read_zip(filename):
-    with zipfile.ZipFile(os.path.join(os.getcwd()+'/static/Files/', filename), 'r') as zip_ref:
-        zip_ref.extractall(os.path.join(os.getcwd()+'/static/Zip_Extracted/'))
-    li = os.listdir(os.path.join(os.getcwd()+'/static/Zip_Extracted/'))
-
-async def store_zip(request):
-
-    reader = await request.multipart()
-    zip = await reader.next()
-    filename = zip.filename
-    # You cannot rely on Content-Length if transfer is chunked.
-    size = 0
-    with open(os.path.join(os.getcwd()+'/static/Files/', filename), 'wb') as f:
-        while True:
-            chunk = await zip.read_chunk()  # 8192 bytes by default.
-            if not chunk:
-                break
-            size += len(chunk)
-            f.write(chunk)
+    #Home page handler#
+    async def index_handler(self,request):
+        return self.html_response(self.home_page_url)
 
 
-    await read_zip(filename)
-    input("checkpont 1")
+'''
+Zip file related operations
+'''
+class ZipOps:
+    def __init__(self):
+        self.zip_storing_loc = "/static/Files/"
+        self.zip_extracting_loc = "/static/Zip_Extracted/"
+        pass
 
-    return web.HTTPFound('/jss')
+    #Passing data of file names to html#
+    async def file_names_parser(self,request):
+        self.context = {'name': 'Andrew', 'surname': 'Svetlov'}
+        input(self.context)
+        self.response = aiohttp_jinja2.render_template('test.html', request, self.context)
+        self.response.headers['Content-Language'] = 'eng'
+        return self.response
+
+    #Reading and Extracting the zip file contents#
+    async def read_zip(self,filename):
+        with zipfile.ZipFile(os.path.join(os.getcwd()+self.zip_storing_loc, filename), 'r') as zip_ref:
+            zip_ref.extractall(os.path.join(os.getcwd()+self.zip_extracting_loc))
+
+    #Webstreaming for reading the passed data of zip files#
+    async def store_zip(self,request):
+        reader = await request.multipart()
+        zip = await reader.next()
+        filename = zip.filename
+        size = 0
+        with open(os.path.join(os.getcwd()+self.zip_storing_loc, filename), 'wb') as f:
+            while True:
+                chunk = await zip.read_chunk()  # 8192 bytes by default.
+                if not chunk:
+                    break
+                size += len(chunk)
+                f.write(chunk)
+        await self.read_zip(filename)
+        input("checkpont 1")
+        return web.HTTPFound('/jss')
+
+html = HtmlParser()
+zip_ops = ZipOps()
+
+app.router.add_route('GET', '/', html.index_handler)
+app.router.add_route('GET', '/jss', zip_ops.file_names_parser)
+app.router.add_route('POST', '/myfun', zip_ops.store_zip)
 
 
-
-app = web.Application()
-app.add_routes(routes)
-aiohttp_jinja2.setup(app,
-    loader=jinja2.FileSystemLoader('./templates'))
-app.router.add_get('/', index_handler)
-app.router.add_post('/myfun', store_zip)
-app.router.add_get('/jss', json_passer)
+#Run the web app#
 web.run_app(app)
