@@ -11,8 +11,6 @@ async def index_handler(request):
     web.json_response(data)
 
 
-
-
 app = web.Application()
 app.add_routes(routes)
 app.router.add_get('/', index_handler)
