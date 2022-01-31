@@ -33,12 +33,18 @@ class ZipOps:
         pass
 
     #Passing data of file names to html#
+    @aiohttp_jinja2.template("test.html")
     async def file_names_parser(self,request):
-        self.context = {'name': 'Andrew', 'surname': 'Svetlov'}
-        input(self.context)
-        self.response = aiohttp_jinja2.render_template('test.html', request, self.context)
-        self.response.headers['Content-Language'] = 'eng'
-        return self.response
+        self.ls = os.listdir(os.getcwd()+self.zip_extracting_loc)
+        self.context = {}
+
+        cnt = 1
+        for f in self.ls:
+            self.context['file'+str(cnt)] = f
+            cnt+=1
+
+        self.context['file_counts'] = cnt
+        return {"Zip_Files":self.ls}
 
     #Reading and Extracting the zip file contents#
     async def read_zip(self,filename):
@@ -59,7 +65,6 @@ class ZipOps:
                 size += len(chunk)
                 f.write(chunk)
         await self.read_zip(filename)
-        input("checkpont 1")
         return web.HTTPFound('/jss')
 
 html = HtmlParser()

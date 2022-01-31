@@ -1,8 +1,34 @@
+<form>
+    <div id="FILES">
+{% for files in Zip_Files %}
+    <input type="radio" id={{loop.index}} name={{loop.index}} value={{files}}>
+    <label for={{loop.index}}>{{files}}</label><br/>
+{% endfor %}
+
+</div>
+    <button  onclick="myfunction()" type="submit">Submit</button>
+
+</form>
+
+
+<a class="label label-primary" href=/home/mtech/PycharmProjects/FileExtractor-MTechLabs/static/Zip_Extracted/kourosh-qaffari-RrhhzitYizg-unsplash.jpg target="_blank"  style="margin-right: 5px;">Download pdf </a>
+
 <script>
-    console.log("Test Java script")
-    console.log(fetch("http://0.0.0.0:8080/jss/get").then(test))
+function myfunction(){
+    for (let i=1 ; i <= {{Zip_Files|length}}; i++)
+    {
+        if (document.getElementById(i.toString()).checked == true)
+        {
+            var link = document.createElement("a");
+            var name = document.getElementById(i.toString()).value;
+            link.setAttribute('download',  name);
+            link.href = "/home/mtech/PycharmProjects/FileExtractor-MTechLabs/static/Zip_Extracted/".concat(name);
+            alert(link.href)
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+        }
+    }
+}
+
 </script>
-
-Hello world
-
-{{ name}}
