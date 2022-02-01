@@ -1,4 +1,4 @@
-<form>
+<form action="/file_query" method="post" accept-charset="utf-8"   enctype="application/x-www-form-urlencoded">
     <div id="FILES">
 {% for files in Zip_Files %}
     <input type="radio" id={{loop.index}} name={{loop.index}} value={{files}}>
@@ -10,8 +10,7 @@
 
 </form>
 
-
-<a class="label label-primary" href=/home/mtech/PycharmProjects/FileExtractor-MTechLabs/static/Zip_Extracted/kourosh-qaffari-RrhhzitYizg-unsplash.jpg target="_blank"  style="margin-right: 5px;">Download pdf </a>
+<a class="label label-primary" href="{{ static ( Zip_Files[0] ) }}" target="_blank"  style="margin-right: 5px;">Download pdf </a>
 
 <script>
 function myfunction(){
@@ -22,13 +21,11 @@ function myfunction(){
             var link = document.createElement("a");
             var name = document.getElementById(i.toString()).value;
             link.setAttribute('download',  name);
-            link.href = "/home/mtech/PycharmProjects/FileExtractor-MTechLabs/static/Zip_Extracted/".concat(name);
-            alert(link.href)
+            var static_path = "/Zip_Extracted/".concat(name);
             document.body.appendChild(link);
             link.click();
             link.remove();
         }
     }
 }
-
 </script>

@@ -10,6 +10,10 @@ app.add_routes(routes)
 #Setting up the jinja rendering#
 def setup_jinja():
     aiohttp_jinja2.setup(app,loader=jinja2.FileSystemLoader('./templates'))
+
+app['static_root_url'] = '/static'
+
+
 setup_jinja()
 
 

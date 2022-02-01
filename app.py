@@ -30,21 +30,23 @@ class ZipOps:
     def __init__(self):
         self.zip_storing_loc = "/static/Files/"
         self.zip_extracting_loc = "/static/Zip_Extracted/"
+        self.zip_files_ls = None
         pass
 
     #Passing data of file names to html#
     @aiohttp_jinja2.template("test.html")
     async def file_names_parser(self,request):
-        self.ls = os.listdir(os.getcwd()+self.zip_extracting_loc)
+        self.zip_files_ls = os.listdir(os.getcwd()+self.zip_extracting_loc)
         self.context = {}
 
         cnt = 1
-        for f in self.ls:
+        for f in self.zip_files_ls:
             self.context['file'+str(cnt)] = f
             cnt+=1
 
         self.context['file_counts'] = cnt
-        return {"Zip_Files":self.ls}
+
+        return {"Zip_Files":self.zip_files_ls}
 
     #Reading and Extracting the zip file contents#
     async def read_zip(self,filename):
@@ -67,12 +69,28 @@ class ZipOps:
         await self.read_zip(filename)
         return web.HTTPFound('/jss')
 
+    @aiohttp_jinja2.template("downloader.html")
+    async def pass_file(self,request):
+        data = await request.post()
+        self.files_to_pass = []
+        print(data)
+        for i in data.keys():
+            print(i)
+            self.files_to_pass.append("/Zip_Extracted/"+self.zip_files_ls[int(i)-1])
+        return {"Selected_Files":self.files_to_pass}
+
+
+
 html = HtmlParser()
 zip_ops = ZipOps()
 
 app.router.add_route('GET', '/', html.index_handler)
 app.router.add_route('GET', '/jss', zip_ops.file_names_parser)
 app.router.add_route('POST', '/myfun', zip_ops.store_zip)
+app.router.add_route('POST', '/file_query', zip_ops.pass_file)
+
+STATIC_PATH = os.path.join(os.path.dirname(__file__), "static")
+app.router.add_static('/static/', STATIC_PATH, name='static')
 
 
 #Run the web app#

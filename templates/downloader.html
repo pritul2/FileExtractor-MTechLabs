@@ -5,8 +5,18 @@
     <title>File Download</title>
 </head>
 <body>
-Hello world
 
+{% for files in Selected_Files %}
+    <a class="label label-primary" id={{loop.index}} name={{loop.index}} href="{{ static ( files ) }}" target="_blank"  style="margin-right: 5px;">Download pdf </a>
+{% endfor %}
+
+<p id="demo"></p>
+
+<script>
+function myFunction(a, b) {
+  alert(document.getElementById("1".toString()).value);
+}
+document.getElementById("demo").innerHTML = myFunction(10, 2);
+</script>
 </body>
-<script src="js/myscript.js"></script>
 </html>
