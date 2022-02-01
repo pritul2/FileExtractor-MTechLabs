@@ -1,3 +1,10 @@
+'''
+Copyright Version: BETA
+Developer: Pritul Dave
+Organization: Maruti Tech Labs
+This software is free to reuse
+'''
+
 import setup_server
 from setup_server import app
 from aiohttp import web
