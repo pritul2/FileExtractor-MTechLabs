@@ -7,3 +7,7 @@ Develop a web application page where users can upload a zip file and all the fil
 
 
 🚧 ........ Under Construction ........ 🚧
+
+
+<b> Running WebServer </b>
+python app.py
