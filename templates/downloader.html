@@ -5,10 +5,22 @@
     <title>File Download</title>
 </head>
 <body>
-
-{% for files in Selected_Files %}
-    <a class="label label-primary" id={{loop.index}} name={{loop.index}} href="{{ static ( files ) }}" target="_blank"  style="margin-right: 5px;">Download pdf </a>
-{% endfor %}
+<div class=" container-xxl">
+    <div class="container-fluid">
+        <div class='form-group row'>
+            <div class="col-md-6">
+                <div class="card" style="width: 58rem;">
+                    <div class="card-body">
+                        {% for files in Selected_Files %}
+                            <a class="label label-primary" download id={{loop.index}} name={{loop.index}} href="{{ static ( files ) }}" target="_blank"  style="margin-right: 5px;">Download File {{loop.index}} </a>
+                            <br/>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 <p id="demo"></p>
 

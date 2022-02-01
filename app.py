@@ -34,7 +34,7 @@ class ZipOps:
         pass
 
     #Passing data of file names to html#
-    @aiohttp_jinja2.template("test.html")
+    @aiohttp_jinja2.template("file_selector.html")
     async def file_names_parser(self,request):
         self.zip_files_ls = os.listdir(os.getcwd()+self.zip_extracting_loc)
         self.context = {}
